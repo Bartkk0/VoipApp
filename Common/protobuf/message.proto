@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+message ContainerMessage {
+  MessageType type = 1;
+  
+  oneof message{
+    ChatMessage chatMessage = 2;
+    JoinMessage joinMessage = 3;
+    UserUpdate userUpdate = 4;
+    ChannelsUpdate channelsUpdate =5;
+    AuthMessage authMessage = 6;
+  }
+}
+
+enum MessageType {
+  CHAT_MESSAGE = 0;
+  JOIN_MESSAGE = 1;
+  USER_UPDATE = 2;
+  CHANNELS_UPDATE = 3;
+  AUTHENTICATION = 4;
+}
+
+message ChatMessage {
+  string name = 1;
+  optional string content = 2;
+  optional int64 timestamp = 3;
+}
+
+message JoinMessage {
+  string name = 1;
+}
+
+message UserUpdate {
+  optional string name = 1;
+  optional string profileUrl = 2;
+}
+
+message ChannelsUpdate {
+  repeated ChannelWrapper channels = 1;
+  
+  message ChannelWrapper {
+    oneof channel {
+      TextChannel textChannel = 1;
+      VoiceChannel voiceChannel = 2;
+    }
+  }
+  
+  message TextChannel {
+    string name = 1;
+  }
+  
+  message VoiceChannel {
+    string name = 1;
+    repeated string users = 2;
+  }
+}
+
+
+
+message AuthMessage {
+  string name = 1;
+  optional string password = 2;
+}
