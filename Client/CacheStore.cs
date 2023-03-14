@@ -1,9 +1,8 @@
 namespace Client;
 
-public class CacheStore<TKey, TValue>
-{
-    private Dictionary<TKey, TValue> _cache = new();
-    private Dictionary<TKey, Task<TValue>> _resolvers = new();
+public class CacheStore<TKey, TValue> where TKey : notnull {
+    private readonly Dictionary<TKey, TValue> _cache = new();
+    private readonly Dictionary<TKey, Task<TValue>> _resolvers = new();
     private readonly Func<TKey,Task<TValue>> _resolver;
 
     public CacheStore(Func<TKey, Task<TValue>> resolver)

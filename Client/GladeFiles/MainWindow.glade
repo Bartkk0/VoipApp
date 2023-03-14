@@ -19,13 +19,14 @@
   </object>
   <object class="GtkWindow" id="MainWindow">
     <property name="can-focus">False</property>
+    <signal name="delete-event" handler="OnDelete" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkMenuBar">
+          <object class="GtkMenuBar" id="_menuBar">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <child>
@@ -63,6 +64,7 @@
                         <property name="can-focus">False</property>
                         <property name="image">image2</property>
                         <property name="use-stock">False</property>
+                        <signal name="activate" handler="UserSettingsActivated" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -113,7 +115,7 @@
             <property name="can-focus">True</property>
             <child>
               <object class="GtkBox">
-                <property name="width-request">128</property>
+                <property name="width-request">150</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
@@ -131,6 +133,7 @@
                             <property name="width-request">0</property>
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <signal name="row-selected" handler="ChannelsRowSelected" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -281,7 +284,7 @@
                 </child>
                 <child>
                   <object class="GtkScrolledWindow">
-                    <property name="width-request">128</property>
+                    <property name="width-request">100</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="shadow-type">in</property>

@@ -13,11 +13,13 @@ public class UserWidget : Bin {
     public UserWidget(string name) {
         _nameLabel.Text = name;
 
-        _events.ButtonPressEvent += delegate {
-            Console.WriteLine("popover");
-            var popover = new UserPopoverWidget(this);
-            popover.ShowAll();
-            popover.Popup();
+        _events.ButtonPressEvent += (o, args) => {
+            Console.WriteLine(args.Event.Button);
+            if (args.Event.Button == 3) {
+                var popover = new UserPopoverWidget(this,name);
+                popover.ShowAll();
+                popover.Popup();
+            }
         };
     }
 }

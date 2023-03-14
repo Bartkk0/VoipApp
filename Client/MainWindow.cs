@@ -1,5 +1,7 @@
 using Client.Widgets;
+using Gdk;
 using Gtk;
+using Window = Gtk.Window;
 
 namespace Client;
 using UI = Gtk.Builder.ObjectAttribute;
@@ -7,11 +9,12 @@ using UI = Gtk.Builder.ObjectAttribute;
 public class MainWindow : Window {
     private ChatClient _client;
     
-    [UI] private ListBox _messageList = null!;
-    [UI] private Entry _messageEntry = null!;
-    [UI] private Button _sendButton = null!;
-    [UI] private ListBox _userList = null!;
-    [UI] private ListBox _channelList = null!;
+    [UI] private readonly ListBox _messageList = null!;
+    [UI] private readonly Entry _messageEntry = null!;
+    [UI] private readonly Button _sendButton = null!;
+    [UI] private readonly ListBox _userList = null!;
+    [UI] private readonly ListBox _channelList = null!;
+    [UI] private readonly MenuBar _menuBar = null!;
 
     private VoiceChannelWidget? _lastSelectedVc;
     
@@ -20,6 +23,8 @@ public class MainWindow : Window {
     private MainWindow(Builder builder) : base(builder.GetRawOwnedObject("MainWindow")) {
         _client = new();
         _client.Connect();
+            
+        builder.Autoconnect(this);
 
         _client.OnMessage += message => {
             Application.Invoke(delegate {
@@ -41,18 +46,8 @@ public class MainWindow : Window {
             });
         };
         
-        
-        builder.Autoconnect(this);
-
         _messageEntry.Activated += (_,_) => OnSend();
         _sendButton.Clicked += (_,_) => OnSend();
-
-        _channelList.RowSelected += (sender, args) => {
-            _lastSelectedVc?.DeselectAll();
-            if (args.Row.Child is VoiceChannelWidget vc) {
-                _lastSelectedVc = vc;
-            }
-        };
 
         for (int i = 0; i < 10; i++) {
             var c = new TextChannelWidget("#text-channel-"+i);
@@ -66,9 +61,6 @@ public class MainWindow : Window {
             _channelList.Add(v);
             v.Show();
         }
-
-        // var dialog = new SettingsDialog();
-        // dialog.Show();
     }
 
     private void OnSend() {
@@ -76,5 +68,22 @@ public class MainWindow : Window {
 
         _client.SendMessage(_messageEntry.Text);
         _messageEntry.Text = "";
+    }
+
+    private void OnDelete(object sender, DeleteEventArgs args) {
+        Application.Quit();
+        Environment.Exit(0);
+    }
+
+    private void ChannelsRowSelected(object sender, RowSelectedArgs args) {
+            _lastSelectedVc?.DeselectAll();
+            if (args.Row.Child is VoiceChannelWidget vc) {
+                _lastSelectedVc = vc;
+            }
+    }
+
+    private void UserSettingsActivated(object sender, EventArgs args) {
+        var dialog = new SettingsDialog();
+        dialog.Show();
     }
 }
