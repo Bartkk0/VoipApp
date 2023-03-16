@@ -1,8 +1,7 @@
-namespace Client; 
+namespace Client;
 
 public static class Constants {
-    public static string[] ProfilePictures =
-    {
+    public static string[] ProfilePictures = {
         "https://d.furaffinity.net/art/feve/1514624160/1514624160.feve_yourpalragsiconglasses.png",
         "https://static1.e926.net/data/preview/9a/9d/9a9d1e27928515c663a511757ac41332.jpg",
         "https://static1.e926.net/data/preview/ee/e5/eee58013e297de49283cd0606894cd4b.jpg",

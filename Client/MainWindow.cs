@@ -1,89 +1,121 @@
+using Client.Types;
 using Client.Widgets;
-using Gdk;
 using Gtk;
-using Window = Gtk.Window;
+using JetBrains.Annotations;
 
 namespace Client;
-using UI = Gtk.Builder.ObjectAttribute;
+
+using UI = Builder.ObjectAttribute;
 
 public class MainWindow : Window {
-    private ChatClient _client;
-    
-    [UI] private readonly ListBox _messageList = null!;
-    [UI] private readonly Entry _messageEntry = null!;
-    [UI] private readonly Button _sendButton = null!;
-    [UI] private readonly ListBox _userList = null!;
     [UI] private readonly ListBox _channelList = null!;
+    private readonly ChatClient _client;
+    [UI] private readonly Label _connectionLabel = null!;
     [UI] private readonly MenuBar _menuBar = null!;
+    [UI] private readonly Entry _messageEntry = null!;
+
+    [UI] private readonly ListBox _messageList = null!;
+    [UI] private readonly Button _sendButton = null!;
+    [UI] private readonly Label _tcLabel = null!;
+    [UI] private readonly Label _topicLabel = null!;
+    [UI] private readonly ListBox _userList = null!;
 
     private VoiceChannelWidget? _lastSelectedVc;
-    
-    public MainWindow() : this(new Builder("MainWindow.glade")) { }
+    private TextChannel? _selectedTextChannel;
+
+    public MainWindow() : this(new Builder("MainWindow.glade")) {
+    }
 
     private MainWindow(Builder builder) : base(builder.GetRawOwnedObject("MainWindow")) {
-        _client = new();
-        _client.Connect();
-            
         builder.Autoconnect(this);
+
+        _connectionLabel.Text = "Connecting to server...";
+        _client = new ChatClient("127.0.0.1", 3621, "Bartkk " + Random.Shared.Next(100, 999));
+        _client.Connect();
 
         _client.OnMessage += message => {
             Application.Invoke(delegate {
-                var w = new MessageWidget(message.Name,message.Content, message.Timestamp);
+                if (message.ChannelId != _selectedTextChannel?.ChannelId)
+                    return;
+
+                var w = new MessageWidget(message, _client.GetUser(message.UserId));
                 _messageList.Add(w);
                 w.Show();
             });
         };
 
-        _client.OnUserJoin += join => {
+        _client.OnUserJoin += user => {
             Application.Invoke(delegate {
-                var w = new JoinWidget(join.Name);
-                _messageList.Add(w);
-                w.Show();
-
-                var u = new UserWidget(join.Name);
+                var u = new UserWidget(user);
                 _userList.Add(u);
                 u.Show();
             });
         };
-        
-        _messageEntry.Activated += (_,_) => OnSend();
-        _sendButton.Clicked += (_,_) => OnSend();
 
-        for (int i = 0; i < 10; i++) {
-            var c = new TextChannelWidget("#text-channel-"+i);
-            _channelList.Add(c);
-            c.Show();
+        _client.OnUserLeave += user => {
+            Application.Invoke(delegate {
+                var u = _userList.Children.First(w => ((UserWidget)((ListBoxRow)w).Child).User.UserId == user);
+                _userList.Remove(u);
+            });
+        };
 
-            var v = new VoiceChannelWidget("Test voice " + i);
-            for (int j = 0; j < Random.Shared.Next(-1,5); j++) {
-                v.AddUser("User " + i);
-            }
-            _channelList.Add(v);
-            v.Show();
-        }
+        _client.OnChannelCreated += channel => {
+            Application.Invoke(delegate { _channelList.Add(new TextChannelWidget(channel)); });
+        };
+
+        _client.OnConnected += delegate {
+            Application.Invoke(delegate { _connectionLabel.Text = $"Connected to {_client.Hostname}"; });
+        };
+
+
+        _client.OnPing += delegate(int ping) {
+            Application.Invoke(delegate { _connectionLabel.Text = $"Connected to {_client.Hostname} ({ping}ms)"; });
+        };
+
+        _messageEntry.Activated += (_, _) => OnSend();
+        _sendButton.Clicked += (_, _) => OnSend();
     }
 
     private void OnSend() {
-        if(_messageEntry.Text.Length == 0) return;
+        if (_messageEntry.Text.Length == 0) return;
+        if (_selectedTextChannel == null) return;
 
-        _client.SendMessage(_messageEntry.Text);
+        _client.SendMessage(_messageEntry.Text, _selectedTextChannel);
         _messageEntry.Text = "";
     }
 
+    [UsedImplicitly]
     private void OnDelete(object sender, DeleteEventArgs args) {
         Application.Quit();
         Environment.Exit(0);
     }
 
+    [UsedImplicitly]
     private void ChannelsRowSelected(object sender, RowSelectedArgs args) {
-            _lastSelectedVc?.DeselectAll();
-            if (args.Row.Child is VoiceChannelWidget vc) {
-                _lastSelectedVc = vc;
-            }
+        _lastSelectedVc?.DeselectAll();
+        if (args.Row.Child is VoiceChannelWidget vc) _lastSelectedVc = vc;
+
+        if (args.Row.Child is TextChannelWidget tc) ChangeChannel(tc.Channel);
     }
 
+    [UsedImplicitly]
     private void UserSettingsActivated(object sender, EventArgs args) {
         var dialog = new SettingsDialog();
+
+        dialog.OnSave += delegate(byte[] image) { _client.SetProfileImage(image); };
+
         dialog.Show();
+    }
+
+    private void ChangeChannel(TextChannel channel) {
+        _selectedTextChannel = channel;
+        _tcLabel.Text = channel.Name;
+        _topicLabel.Text = channel.Topic;
+
+        foreach (var o in _messageList.Children) _messageList.Remove(o);
+
+        var ch = _client.Messages[channel.ChannelId];
+        foreach (var chatMessage in ch)
+            _messageList.Add(new MessageWidget(chatMessage, _client.GetUser(chatMessage.UserId)));
     }
 }

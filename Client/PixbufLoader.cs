@@ -1,25 +1,31 @@
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Unicode;
 using Common;
 using Gdk;
 
 namespace Client;
 
 public static class PixbufLoader {
-    private static HttpClient _http = new();
-    private static Dictionary<string, SemaphoreSlim> _queue = new();
-    private static Dictionary<string, Pixbuf> _cache = new();
+    private static readonly HttpClient _http = new();
 
-    private static CacheStore<string, Pixbuf> _cacheStore = new(ResolveFromUrl);
+    private static readonly CacheStore<string, Pixbuf?> _cacheStore = new(ResolveFromUrl);
 
-    public static Task<Pixbuf> GetFromUrl(string url) {
+    public static Task<Pixbuf?> GetFromUrl(string url) {
         return _cacheStore.GetAsync(url);
     }
 
-    private static async Task<Pixbuf> ResolveFromUrl(string url) {
-        string hash = Base32Convert.Encode(SHA256.HashData(Encoding.UTF8.GetBytes(url)));
+    private static async Task<Pixbuf?> ResolveFromUrl(string url) {
+        try {
+            var str = await _http.GetStreamAsync(url);
+            return new Pixbuf(str);
+        }
+        catch (Exception e) {
+            Console.WriteLine("Failed downloading pixbuf");
+            return null;
+        }
+
+        // TODO: Fix file locking when running multiple instances
+        var hash = Base32Convert.Encode(SHA256.HashData(Encoding.UTF8.GetBytes(url)));
         var imagePath = Path.Combine(new[] { "image_cache", hash + Path.GetExtension(url) });
 
         if (!File.Exists(imagePath)) {
@@ -34,7 +40,7 @@ public static class PixbufLoader {
             // return pixbuf;
         }
 
-        var file = File.OpenRead(imagePath);
+        var file = File.Open(imagePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         return new Pixbuf(file);
     }
 }

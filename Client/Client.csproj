@@ -8,18 +8,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common\Common.csproj" />
+        <ProjectReference Include="..\Common\Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="**\*.glade" />
+        <None Remove="**\*.glade"/>
         <EmbeddedResource Include="**\*.glade">
             <LogicalName>%(Filename)%(Extension)</LogicalName>
         </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="gtksharp" Version="3.24.24.74-develop" />
+        <None Remove="**\*.css"/>
+        <EmbeddedResource Include="**\*.css">
+            <LogicalName>%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="gtksharp" Version="3.24.24.74-develop"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2022.3.1"/>
     </ItemGroup>
 
 </Project>

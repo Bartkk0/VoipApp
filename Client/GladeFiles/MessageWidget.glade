@@ -11,13 +11,20 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <child>
-          <object class="GtkImage" id="_authorImage">
-            <property name="width-request">48</property>
-            <property name="height-request">48</property>
+          <object class="GtkEventBox" id="_events">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="pixel-size">0</property>
-            <property name="icon-name">dialog-warning</property>
+            <child>
+              <object class="GtkImage" id="_authorImage">
+                <property name="width-request">48</property>
+                <property name="height-request">48</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="yalign">0</property>
+                <property name="pixel-size">48</property>
+                <property name="icon-name">dialog-warning</property>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -75,6 +82,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">MESSAGE MESSAGE MESSAGE MESSAGE MESSAGE MESSAGE MESSAGE MESSAGE </property>
+                <property name="wrap">True</property>
+                <property name="wrap-mode">word-char</property>
                 <property name="selectable">True</property>
                 <property name="xalign">0</property>
                 <property name="yalign">0</property>
@@ -83,6 +92,19 @@
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">2</property>
+                <property name="icon-name">accessories-text-editor</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>

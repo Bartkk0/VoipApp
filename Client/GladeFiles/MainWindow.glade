@@ -173,7 +173,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkLabel" id="_tcLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="margin-end">8</property>
@@ -190,7 +190,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkLabel" id="_topicLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="label" translatable="yes">Channel topic here</property>
@@ -212,7 +212,11 @@
                           <object class="GtkScrolledWindow">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
+                            <property name="hscrollbar-policy">never</property>
+                            <property name="vscrollbar-policy">always</property>
                             <property name="shadow-type">in</property>
+                            <property name="overlay-scrolling">False</property>
+                            <property name="propagate-natural-width">True</property>
                             <child>
                               <object class="GtkViewport">
                                 <property name="visible">True</property>
@@ -248,6 +252,9 @@
                           <object class="GtkEntry" id="_messageEntry">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
+                            <property name="placeholder-text" translatable="yes">Message</property>
+                            <property name="show-emoji-icon">True</property>
+                            <property name="enable-emoji-completion">True</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -318,6 +325,29 @@
             <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkLabel" id="_connectionLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Connecting to server...</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

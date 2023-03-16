@@ -1,4 +1,4 @@
-using Gdk;
+using Client.Types;
 using GLib;
 using Gtk;
 
@@ -8,8 +8,10 @@ namespace Client.Widgets;
 [TypeName(nameof(TextChannelWidget))]
 public class TextChannelWidget : Bin {
     [Child] private readonly Label _nameLabel = null!;
+    public TextChannel Channel;
 
-    public TextChannelWidget(string name) {
-        _nameLabel.Text = name;
+    public TextChannelWidget(TextChannel channel) {
+        Channel = channel;
+        _nameLabel.Text = channel.Name;
     }
 }

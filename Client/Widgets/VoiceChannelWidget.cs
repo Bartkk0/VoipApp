@@ -1,4 +1,4 @@
-using Gdk;
+using Client.Types;
 using GLib;
 using Gtk;
 
@@ -14,8 +14,8 @@ public class VoiceChannelWidget : Bin {
         _nameLabel.Text = name;
     }
 
-    public void AddUser(string name) {
-        var u = new UserWidget(name);
+    public void AddUser(User user) {
+        var u = new UserWidget(user);
         _userList.Add(u);
     }
 

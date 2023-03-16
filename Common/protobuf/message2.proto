@@ -1,0 +1,98 @@
+//syntax = "proto3";
+//
+//import public "protobuf/types.proto";
+//
+//message PktContainerMessage {
+//  PktMessageType type = 1;
+//
+//  oneof message{
+//    PktChatMessage chatMessage = 2;
+//    PktJoinMessage joinMessage = 3;
+//    PktUserUpdate userUpdate = 4;
+//    PktChannelsUpdate channelsUpdate = 5;
+//    PktAuthMessage authMessage = 6;
+//    PktClientInitMessage clientInit = 7;
+//    PktMassMessages massMessages = 8;
+//    PktLeaveMessage leaveMessage = 9;
+//    PktPing ping = 10;
+//  }
+//}
+//
+//enum PktMessageType {
+//  CHAT_MESSAGE = 0;
+//  JOIN_MESSAGE = 1;
+//  USER_UPDATE = 2;
+//  CHANNELS_UPDATE = 3;
+//  AUTHENTICATION = 4;
+//  CLIENT_INIT = 5;
+//  MASS_MESSAGES = 6;
+//  LEAVE_MESSAGE = 7;
+//  PING = 8;
+//  UPDATE_PROFILE = 9;
+//}
+//
+//message PktChatMessage {
+//  PktUser user = 1;
+//  string channelName = 2;
+//  optional string content = 3;
+//  optional int64 timestamp = 4;
+//}
+//
+//message PktJoinMessage {
+//  PktUser user = 1;
+//}
+//
+//message PktUserUpdate {
+//  string name = 1;
+//  //  optional string newName = 2;
+//  optional bytes newImage = 3;
+//}
+//
+//message PktChannelsUpdate {
+//  repeated PktChannelWrapper channels = 1;
+//}
+//
+//message PktAuthMessage {
+//  string name = 1;
+//  optional string password = 2;
+//}
+//
+//message PktClientInitMessage {
+//  repeated PktChannelWrapper channels = 1;
+//  repeated PktUser users = 2;
+//}
+//
+//message PktMassMessages{
+//  string channelName = 1;
+//  repeated PktChatMessage messages = 2;
+//}
+//
+//message PktLeaveMessage{
+//  string username = 1;
+//  string reason = 2;
+//}
+//
+//message PktPing{
+//  int64 timestamp = 1;
+//}
+//
+//message PktChannelWrapper {
+//  oneof channel {
+//    PktTextChannel textChannel = 1;
+//    PktVoiceChannel voiceChannel = 2;
+//  }
+//}
+//
+//message PktTextChannel {
+//  string name = 1;
+//  string topic = 2;
+//}
+//
+//message PktVoiceChannel {
+//  string name = 1;
+//  repeated string users = 2;
+//}
+//
+//message PktUser {
+//  string name = 1;
+//}

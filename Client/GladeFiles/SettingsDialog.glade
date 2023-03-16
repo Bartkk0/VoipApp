@@ -4,6 +4,7 @@
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkDialog" id="SettingsDialog">
     <property name="can-focus">False</property>
+    <property name="window-position">center</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox">
@@ -15,12 +16,13 @@
             <property name="can-focus">False</property>
             <property name="layout-style">end</property>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="_closeButton">
                 <property name="label">gtk-discard</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-stock">True</property>
+                <signal name="activate" handler="OnCloseClicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -29,12 +31,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="_saveButton">
                 <property name="label">gtk-apply</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="use-stock">True</property>
+                <signal name="activate" handler="OnSaveClicked" swapped="yes"/>
+                <signal name="clicked" handler="OnSaveClicked" swapped="yes"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -53,13 +57,39 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="primary-icon-name">contact-new</property>
-                <property name="placeholder-text" translatable="yes">Username</property>
+                <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkImage" id="_profileImage">
+                    <property name="width-request">128</property>
+                    <property name="height-request">128</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="stock">gtk-missing-image</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="_profileChooser">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="filter">filefilter1</property>
+                    <property name="title" translatable="yes">Select profile picture</property>
+                    <signal name="file-set" handler="FileChosen" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -68,20 +98,35 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry">
+              <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="primary-icon-name">emblem-photos</property>
-                <property name="placeholder-text" translatable="yes">Profile image URL</property>
+                <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkEntry">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="primary-icon-name">contact-new</property>
+                    <property name="placeholder-text" translatable="yes">Username</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
@@ -92,5 +137,10 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkFileFilter" id="filefilter1">
+    <mime-types>
+      <mime-type>image/*</mime-type>
+    </mime-types>
   </object>
 </interface>

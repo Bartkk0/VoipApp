@@ -1,63 +1,197 @@
 syntax = "proto3";
 
-message ContainerMessage {
-  MessageType type = 1;
-  
+enum PacketDirection {
+  CLIENT_TO_SERVER = 0;
+  SERVER_TO_CLIENT = 1;
+}
+
+message ContainerPacket {
+  PacketDirection direction = 1;
+
   oneof message{
-    ChatMessage chatMessage = 2;
-    JoinMessage joinMessage = 3;
-    UserUpdate userUpdate = 4;
-    ChannelsUpdate channelsUpdate =5;
-    AuthMessage authMessage = 6;
+    PktRegister register = 20;
+    PktRegisterResult register_result = 30;
+    PktAuth auth = 40;
+    PktAuthAccept auth_accept = 50;
+    PktAuthReject auth_deny = 60;
+    PktUserState user_state = 70;
+    PktUserRemove user_remove = 80;
+    PktChannelState channel_state = 81;
+    PktChannelRemove channel_remove = 82;
+    PktChatMessage chat_message = 83;
+    PktPing ping = 90;
+    PktQueryUsers query_users = 100;
+    PktBlobData blob_data = 110;
   }
 }
 
-enum MessageType {
-  CHAT_MESSAGE = 0;
-  JOIN_MESSAGE = 1;
-  USER_UPDATE = 2;
-  CHANNELS_UPDATE = 3;
-  AUTHENTICATION = 4;
+// Used for user to register on a server
+message PktRegister {
+  // UTF-8 encoded username
+  string username = 1;
+  // UTF-8 encoded password
+  string password = 2;
 }
 
-message ChatMessage {
-  string name = 1;
-  optional string content = 2;
-  optional int64 timestamp = 3;
-}
+message PktRegisterResult {
+  enum RejectReason {
+    None = 0;
+    // Username doesn't meet requirements
+    InvalidUsername = 1;
+    // Username is already in use
+    UsernameExists = 2;
+    // Server rejects the password
+    PasswordInvalid = 3;
+    // Registration is closed
+    RegistrationClosed = 4;
+  }
 
-message JoinMessage {
-  string name = 1;
-}
-
-message UserUpdate {
-  optional string name = 1;
-  optional string profileUrl = 2;
-}
-
-message ChannelsUpdate {
-  repeated ChannelWrapper channels = 1;
+  // Was registration successful?
+  // If false see reason and details
+  bool successful = 1;
   
-  message ChannelWrapper {
-    oneof channel {
-      TextChannel textChannel = 1;
-      VoiceChannel voiceChannel = 2;
-    }
-  }
-  
-  message TextChannel {
-    string name = 1;
-  }
-  
-  message VoiceChannel {
-    string name = 1;
-    repeated string users = 2;
-  }
+  // Reason of rejection
+  optional RejectReason reason = 2;
+  // Human readable reason
+  optional string details = 3;
 }
 
-
-
-message AuthMessage {
-  string name = 1;
+// First packet sent from client to server
+message PktAuth{
+  // UTF-8 encoded username
+  string username = 1;
+  // Server password
   optional string password = 2;
+}
+
+// Server successful authentication response
+message PktAuthAccept {
+  // Assigned user id
+  uint32 user_id = 1;
+  // Message of the day
+  optional string motd = 2;
+}
+
+// Server unsuccessful authentication response
+message PktAuthReject {
+  enum RejectReason{
+    None = 0;
+    // User does not exist
+    InvalidUsername = 1;
+    // Invalid password
+    InvalidPassword = 2;
+  }
+  
+  // Rejection reason
+  RejectReason reason = 1;
+  // Human readable details
+  optional string details = 2;
+}
+
+// Sent by the server to communicate new and changed users
+// Sent by the client to update self or attempt to update someone else
+message PktUserState {
+  // User id
+  uint32 user_id = 1;
+  // User name
+  optional string username = 2;
+  // Hash of current profile picture (SHA1)
+  optional string image_hash = 3;
+  // Is user online
+  optional bool online = 4;
+}
+
+// Sent by the server when user leaves
+// Sent by the client when attempting to kick a user
+message PktUserRemove {
+  uint32 user_id = 1;
+  optional string reason = 2;
+  optional bool ban = 3;
+}
+
+// Sent by the server to notify about new or changed channels
+// Sent bu the user to attempt to change a channel
+message PktChannelState{
+  message TextChannel{
+    // Channel topic
+    optional string topic = 1;
+  }
+  message VoiceChannel{
+    // Users in voice channel
+    repeated uint32 user_id = 1;
+    // Max users
+    optional uint32 max_users = 2;
+  }
+  
+  // Unique id for the channel
+  uint32 channel_id = 1;
+  // Channel name
+  optional string channel_name = 2;
+  // Position weight
+  optional int32 position = 3;
+  
+  // Type of the channel and additional data
+  oneof type{
+    TextChannel text_channel = 4;
+    VoiceChannel voice_channel = 5;
+  }
+}
+
+// Sent by the server when channel is removed
+// Sent by the server when attempting to remove a channel
+message PktChannelRemove {
+  uint32 channel_id = 1;
+}
+
+// Sent by the server when user receives a new message
+// Sent by the client to send a new message
+message PktChatMessage {
+  // User that sent the message
+  // Filled by the server
+  optional uint32 user_id = 1;
+  // Target channel
+  uint32 channel_id = 2;
+  // Content of the message
+  string content = 3;
+  // Timestamp of the message
+  // Filled by the server
+  uint64 timestamp = 4;
+}
+
+// Sent by the user to notify that the client is still alive
+// Server should reply without changing the timestamp
+message PktPing {
+  // Used to measure latency. Server shouldn't touch this
+  uint64 timestamp = 1;
+}
+
+// Sent by the user to query a user
+// Server should respond with user state
+message PktQueryUsers{
+  // User ids to query
+  repeated uint32 user_ids = 1;
+}
+
+// Sent by the client to request or upload a binary blob
+// If this is a request the server should only fill in the data
+// If this is a upload the server should fill in the hash
+message PktBlobData {
+  enum BlobType {
+    // Request profile picture by hash
+    ProfilePicture = 0;
+  }
+  
+  // False if this is a request for the blob
+  // True if this is a blob upload
+  bool upload = 1;
+  // Blob hash (SHA1)
+  // Filled in by the client when fetching
+  // Filled in by the server when uploading
+  optional string hash = 2;
+  // Blob type to fetch
+  BlobType blob_type = 3;
+  // Blob data
+  optional bytes data = 4;
+  // If upload then this is a cookie to identify the response
+  optional uint32 cookie = 5;
 }
