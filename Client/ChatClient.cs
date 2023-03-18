@@ -28,7 +28,7 @@ public class ChatClient {
 
     public uint UserId { get; private set; }
 
-    public async Task<byte[]> ResolveProfileImage(string hash) {
+    private async Task<byte[]> ResolveProfileImage(string hash) {
         var cookie = (uint)Random.Shared.Next();
         var semaphore = new SemaphoreSlim(0);
         var pair = new Pair<SemaphoreSlim, byte[]>(semaphore, null);

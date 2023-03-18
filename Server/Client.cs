@@ -21,7 +21,7 @@ public class Client {
 
     public uint UserId { get; private set; }
     public string? Username { get; private set; }
-    public string? ImageHash { get; private set; } = "22NVUA6IYRU3V2ORJEUBQNZOC4QF3AFZ";
+    public string? ImageHash { get; private set; }
 
     public void Start() {
         _myThread = new Thread(ClientThread);
@@ -103,7 +103,8 @@ public class Client {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        else
+        else {
+            if (packet.Hash == "") return;
             switch (packet.BlobType) {
                 case PktBlobData.Types.BlobType.ProfilePicture:
                     var data = _imageStore.GetByHash(packet.Hash);
@@ -115,6 +116,7 @@ public class Client {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
     }
 
     private void QueryUsers(PktQueryUsers packet) {
@@ -182,18 +184,21 @@ public class Client {
             }
         });
 
+        var state = new PktUserState {
+            UserId = UserId,
+            Username = Username,
+            Online = true
+        };
+        
+        if (ImageHash != null) state.ImageHash = ImageHash;
+
+
         _server.Broadcast(new ContainerPacket {
-            UserState = new PktUserState {
-                UserId = UserId,
-                Username = Username,
-                ImageHash = ImageHash,
-                Online = true
-            }
+            UserState = state
         });
 
         // Send currently online users to the client
         foreach (var client in _server.Clients) {
-            PktUserState state;
             state = new PktUserState {
                 UserId = client.UserId,
                 Username = client.Username,

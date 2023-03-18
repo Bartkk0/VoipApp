@@ -60,7 +60,12 @@ public class MainWindow : Window {
         };
 
         _client.OnChannelCreated += channel => {
-            Application.Invoke(delegate { _channelList.Add(new TextChannelWidget(channel)); });
+            Application.Invoke(delegate {
+                _channelList.Add(new TextChannelWidget(channel));
+                if (_selectedTextChannel == null) {
+                    ChangeChannel(channel);
+                }
+            });
         };
 
         _client.OnConnected += delegate {

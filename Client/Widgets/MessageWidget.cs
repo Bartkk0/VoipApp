@@ -19,15 +19,6 @@ public class MessageWidget : Bin {
         _textLabel.Markup = message.Content;
         _timeLabel.Text = message.Timestamp.ToString("T");
         GetUserData(user);
-        // TODO: Implement user popover
-        // _events.ButtonPressEvent += (o, args) => {
-        //     Console.WriteLine(args.Event.Button);
-        //     if (args.Event.Button == 3) {
-        //         var popover = new UserPopoverWidget(_authorImage, message.User);
-        //         popover.ShowAll();
-        //         popover.Popup();
-        //     }
-        // };
     }
 
     private async void GetUserData(Task<User> user) {
@@ -37,17 +28,24 @@ public class MessageWidget : Bin {
 
         u.OnProfileImageChanged += delegate {
             Application.Invoke(async delegate {
-                var pixbuf = new Pixbuf(await u.GetImageBytes());
-                _authorImage.Pixbuf =
-                    pixbuf?.ScaleSimple(_authorImage.WidthRequest, _authorImage.HeightRequest, InterpType.Bilinear);
+                LoadImage(u);
             });
+        };
+        
+        _events.ButtonPressEvent += (o, args) => {
+            Console.WriteLine(args.Event.Button);
+            if (args.Event.Button == 3) {
+                var popover = new UserPopoverWidget(_authorImage,u);
+                popover.ShowAll();
+                popover.Popup();
+            }
         };
     }
 
     private async void LoadImage(User user) {
-        var pixbuf = new Pixbuf(await user.GetImageBytes());
-
-        _authorImage.Pixbuf =
-            pixbuf?.ScaleSimple(_authorImage.WidthRequest, _authorImage.HeightRequest, InterpType.Bilinear);
+        var pixbuf =  await user.GetResizedImage(_authorImage.WidthRequest, _authorImage.HeightRequest);
+        if (pixbuf != null) {
+            _authorImage.Pixbuf = pixbuf;
+        }
     }
 }

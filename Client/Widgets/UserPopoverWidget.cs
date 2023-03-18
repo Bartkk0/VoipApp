@@ -2,6 +2,7 @@ using Client.Types;
 using Gdk;
 using GLib;
 using Gtk;
+using Application = Gtk.Application;
 
 namespace Client.Widgets;
 
@@ -12,16 +13,24 @@ public class UserPopoverWidget : Popover {
     [Child] private readonly Image _profileImage = null!;
 
     public UserPopoverWidget(Widget relativeTo, User user) : base(relativeTo) {
-        _nameLabel.Text = user.Username;
-        LoadProfile(user.Username);
+        GetUserData(user);
     }
 
-    private async void LoadProfile(string name) {
-        // TODO: Implement using actual user profile picture
-        var pixbuf = await PixbufLoader.GetFromUrl(
-            Constants.ProfilePictures[name.ToCharArray().Sum(x => x) % Constants.ProfilePictures.Length]);
+    private async void GetUserData(User user) {
+        _nameLabel.Text = user.Username;
+        LoadImage(user);
 
-        _profileImage.Pixbuf =
-            pixbuf?.ScaleSimple(_profileImage.WidthRequest, _profileImage.HeightRequest, InterpType.Bilinear);
+        user.OnProfileImageChanged += delegate {
+            Application.Invoke(delegate {
+                LoadImage(user);
+            });
+        };
+    }
+
+    private async void LoadImage(User user) {
+        var pixbuf =  await user.GetResizedImage(_profileImage.WidthRequest, _profileImage.HeightRequest);
+        if (pixbuf != null) {
+            _profileImage.Pixbuf = pixbuf;
+        }
     }
 }
