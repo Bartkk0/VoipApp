@@ -1,14 +1,12 @@
 namespace Common;
 
-public class Pair<A, B> {
-    public Pair() {
-    }
+public class Pair<TA, TB> {
 
-    public Pair(A first, B second) {
+    public Pair(TA first, TB second) {
         First = first;
         Second = second;
     }
 
-    public A First { get; set; }
-    public B Second { get; set; }
+    public TA First { get; set; }
+    public TB Second { get; set; }
 }

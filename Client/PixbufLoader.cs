@@ -19,7 +19,7 @@ public static class PixbufLoader {
             var str = await _http.GetStreamAsync(url);
             return new Pixbuf(str);
         }
-        catch (Exception e) {
+        catch (Exception) {
             Console.WriteLine("Failed downloading pixbuf");
             return null;
         }

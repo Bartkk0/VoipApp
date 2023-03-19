@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.22.1"/>
+        <PackageReference Include="Google.Protobuf" Version="3.22.1" />
         <PackageReference Include="Grpc.Tools" Version="2.52.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="protobuf\*.proto"/>
+        <Protobuf Include="protobuf\*.proto" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,9 @@
 using Client.Types;
 using Client.Widgets;
+using GLib;
 using Gtk;
 using JetBrains.Annotations;
+using Application = Gtk.Application;
 
 namespace Client;
 
@@ -22,6 +24,7 @@ public class MainWindow : Window {
 
     private VoiceChannelWidget? _lastSelectedVc;
     private TextChannel? _selectedTextChannel;
+    private NotificationManager _notificationManager = new();
 
     public MainWindow() : this(new Builder("MainWindow.glade")) {
     }
@@ -41,6 +44,8 @@ public class MainWindow : Window {
                 var w = new MessageWidget(message, _client.GetUser(message.UserId));
                 _messageList.Add(w);
                 w.Show();
+                
+                _notificationManager.Message(message);
             });
         };
 
@@ -104,10 +109,17 @@ public class MainWindow : Window {
     }
 
     [UsedImplicitly]
-    private void UserSettingsActivated(object sender, EventArgs args) {
+    private void ServerSettingsActivated(object sender, EventArgs args) {
         var dialog = new SettingsDialog();
 
         dialog.OnSave += delegate(byte[] image) { _client.SetProfileImage(image); };
+
+        dialog.Show();
+    }
+    
+    [UsedImplicitly]
+    private void ClientSettingsActivated(object sender, EventArgs args) {
+        var dialog = new ClientSettingsDialog();
 
         dialog.Show();
     }

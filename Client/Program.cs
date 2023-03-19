@@ -10,10 +10,7 @@ internal class Program {
         Application.Init();
 
         var app = new Application("pl.bartkk.voipapp", ApplicationFlags.None);
-        // app.Register(GLib.Cancellable.Current);
-        var css = new CssProvider();
-        css.LoadFromResource("style.css");
-        StyleContext.AddProviderForScreen(Screen.Default, css, StyleProviderPriority.Application);
+        app.Register(Cancellable.Current);
 
         var win = new MainWindow();
         app.AddWindow(win);

@@ -59,12 +59,12 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem">
-                        <property name="label" translatable="yes">User settings</property>
+                        <property name="label" translatable="yes">Server settings</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="image">image2</property>
                         <property name="use-stock">False</property>
-                        <signal name="activate" handler="UserSettingsActivated" swapped="no"/>
+                        <signal name="activate" handler="ServerSettingsActivated" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -83,11 +83,12 @@
                     <property name="can-focus">False</property>
                     <child>
                       <object class="GtkImageMenuItem">
-                        <property name="label" translatable="yes">imagemenuitem</property>
+                        <property name="label" translatable="yes">Client settings</property>
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="image">image3</property>
                         <property name="use-stock">False</property>
+                        <signal name="activate" handler="ClientSettingsActivated" swapped="no"/>
                       </object>
                     </child>
                   </object>

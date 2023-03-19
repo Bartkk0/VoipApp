@@ -30,9 +30,14 @@ public class SettingsDialog : Dialog {
     private void OnSaveClicked(object sender, EventArgs args) {
         Console.WriteLine("Saving");
         OnSave?.Invoke(_profileImage.Pixbuf.SaveToBuffer("png"));
+        Hide();
+        Dispose();
     }
 
     [UsedImplicitly]
     private void OnCloseClicked(object sender, EventArgs args) {
+        Console.WriteLine("Close");
+        Hide();
+        Dispose();
     }
 }
